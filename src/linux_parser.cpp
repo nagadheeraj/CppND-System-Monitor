@@ -10,6 +10,35 @@ using std::string;
 using std::to_string;
 using std::vector;
 
+class FileParser {
+public:
+	FileParser(string filename) {
+		std::ifstream stream(filename);
+		if (!stream) return;
+		string line;
+		while (std::getline(stream, line))
+			lines_.emplace_back(line);
+	}
+
+	string GetString(string target_key) {
+		for (const auto &line : lines_) {
+			string key, value;
+			std::istringstream ss(line);
+			ss >> key >> value;
+			if (key == target_key)
+				return value;
+		}
+
+		return string();
+	}
+
+	long GetLong(string target_key) {
+		return stol(GetString(target_key));
+	}
+private:
+	vector<string> lines_;
+};
+
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
   string line;
@@ -66,8 +95,20 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization() {
+	FileParser parser(kProcDirectory + kMeminfoFilename);
+	long mem_total = parser.GetLong("MemTotal:");
+	long mem_free = parser.GetLong("MemFree:");
+	long buffers = parser.GetLong("Buffers:");
+	long cached = parser.GetLong("Cached:");
+	long sreclaimable = parser.GetLong("SReclaimable:");
+	long shmem = parser.GetLong("Shmem:");
+	long mem_used = mem_total - mem_free;
+
+	cached += sreclaimable - shmem;
+	mem_used -= buffers + cached;
+	return mem_used / float(mem_total);
+}
 
 long LinuxParser::UpTime() {
 	std::ifstream stream(kProcDirectory + kUptimeFilename);
