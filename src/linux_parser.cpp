@@ -33,7 +33,8 @@ public:
 	}
 
 	long GetLong(string target_key) {
-		return stol(GetString(target_key));
+		string value = GetString(target_key);
+		return value.empty() ? 0 : stol(value);
 	}
 private:
 	vector<string> lines_;
@@ -141,35 +142,14 @@ long LinuxParser::IdleJiffies() { return 0; }
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 int LinuxParser::TotalProcesses() {
-	std::ifstream stream(kProcDirectory + kStatFilename);
-
-	while (stream.is_open()) {
-		string line;
-		std::getline(stream, line);
-		std::istringstream ss(line);
-		string key, count;
-		ss >> key >> count;
-		if (key == "processes")
-			return std::stoi(count);
-	}
-
-	return 0;
+	FileParser parser(kProcDirectory + kStatFilename);
+	return parser.GetLong("processes");
 }
 
 int LinuxParser::RunningProcesses() {
-	std::ifstream stream(kProcDirectory + kStatFilename);
+	FileParser parser(kProcDirectory + kStatFilename);
+	return parser.GetLong("procs_running");
 
-	while (stream.is_open()) {
-		string line;
-		std::getline(stream, line);
-		std::istringstream ss(line);
-		string key, count;
-		ss >> key >> count;
-		if (key == "procs_running")
-			return std::stoi(count);
-	}
-
-	return 0;
 }
 
 // TODO: Read and return the command associated with a process
