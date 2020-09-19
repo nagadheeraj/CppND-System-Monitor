@@ -20,6 +20,15 @@ public:
 			lines_.emplace_back(line);
 	}
 
+	// Description:
+	//
+	// The 'key' is the first word of a line and the
+	// 'value' is the immediate word after the key
+	// on the same line.
+	//
+	// Returns:
+	//	The 'string' value for the given key if found.
+	//	'Empty' string if the key is not found.
 	string GetString(string target_key) {
 		for (const auto &line : lines_) {
 			string key, value;
@@ -32,6 +41,13 @@ public:
 		return string();
 	}
 
+	// Description:
+	//
+	// Same as GetString
+	//
+	// Returns:
+	//	'long' value for the given key if found.
+	//	0 if the key is not found.
 	long GetLong(string target_key) {
 		string value = GetString(target_key);
 		return value.empty() ? 0 : stol(value);
