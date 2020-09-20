@@ -23,11 +23,39 @@ public:
 	// Description:
 	//
 	// The 'key' is the first word of a line and the
+	// 'values' are the words found imediately after
+	// the key on the same line.
+	//
+	// Returns:
+	//	'vector of string' values if the key is found
+	//	'Empty vector' if key is not found
+	vector<string> GetWords(string target_key) {
+		for (const auto &line : lines_) {
+			string key;
+			std::istringstream ss(line);
+			ss >> key;
+			if (key != target_key)
+				continue;
+
+			vector<string> words;
+			string word;
+			while (ss >> word)
+				words.emplace_back(word);
+
+			return words;
+		}
+
+		return {};
+	}
+
+	// Description:
+	//
+	// The 'key' is the first word of a line and the
 	// 'value' is the immediate word after the key
 	// on the same line.
 	//
 	// Returns:
-	//	The 'string' value for the given key if found.
+	//	'string' value if the key is found.
 	//	'Empty' string if the key is not found.
 	string GetString(string target_key) {
 		for (const auto &line : lines_) {
@@ -46,8 +74,8 @@ public:
 	// Same as GetString
 	//
 	// Returns:
-	//	'long' value for the given key if found.
-	//	0 if the key is not found.
+	//	'long' value if if the key is found.
+	//	'0L' if the key is not found.
 	long GetLong(string target_key) {
 		string value = GetString(target_key);
 		return value.empty() ? 0 : stol(value);
@@ -154,8 +182,10 @@ long LinuxParser::ActiveJiffies() { return 0; }
 // TODO: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() { return 0; }
 
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization() {
+	FileParser parser(kProcDirectory + kStatFilename);
+	return parser.GetWords("cpu");
+}
 
 int LinuxParser::TotalProcesses() {
 	FileParser parser(kProcDirectory + kStatFilename);
