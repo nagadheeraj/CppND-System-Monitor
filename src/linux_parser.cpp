@@ -80,6 +80,14 @@ public:
 		string value = GetString(target_key);
 		return value.empty() ? 0 : stol(value);
 	}
+
+	// Description:
+	//
+	// Returns all lines in the file
+	//
+	// Returns:
+	//	List of lines
+	const vector<string>& GetLines() const { return lines_; }
 private:
 	vector<string> lines_;
 };
@@ -206,13 +214,25 @@ string LinuxParser::Command(int pid[[maybe_unused]]) { return string(); }
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid[[maybe_unused]]) { return string(); }
 
-// TODO: Read and return the user ID associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Uid(int pid) {
+	FileParser parser(kProcDirectory + to_string(pid) + kStatusFilename);
+	return parser.GetString("Uid:");
+}
 
-// TODO: Read and return the user associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::User(int pid) {
+	FileParser parser(kPasswordPath);
+
+	for (auto line : parser.GetLines()) {
+		std::replace(line.begin(), line.end(), ':', ' ');
+		string user, passwd, uid;
+		std::istringstream ss(line);
+		ss >> user >> passwd >> uid;
+		if (uid == LinuxParser::Uid(pid))
+			return user;
+	}
+
+	return string();
+}
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function

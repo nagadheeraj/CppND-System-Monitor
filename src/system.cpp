@@ -19,11 +19,16 @@ System::System() {
 	os_ = LinuxParser::OperatingSystem();
 }
 
-// TODO: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
-// TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+vector<Process>& System::Processes() {
+        processes_.clear();
+
+	for (auto& pid : LinuxParser::Pids())
+		processes_.emplace_back(Process(pid));
+
+	return processes_;
+}
 
 std::string System::Kernel() { return kernel_; }
 
