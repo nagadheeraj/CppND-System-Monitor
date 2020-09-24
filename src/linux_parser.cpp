@@ -20,7 +20,7 @@ public:
 			lines_.emplace_back(line);
 	}
 
-	// Description:
+	// Description: GetWords(key)
 	//
 	// The 'key' is the first word of a line and the
 	// 'values' are the words found imediately after
@@ -48,7 +48,7 @@ public:
 		return {};
 	}
 
-	// Description:
+	// Description: GetString(key)
 	//
 	// The 'key' is the first word of a line and the
 	// 'value' is the immediate word after the key
@@ -69,7 +69,7 @@ public:
 		return string();
 	}
 
-	// Description:
+	// Description: GetLong(key)
 	//
 	// Same as GetString
 	//
@@ -81,7 +81,7 @@ public:
 		return value.empty() ? 0 : stol(value);
 	}
 
-	// Description:
+	// Description: GetLines()
 	//
 	// Returns all lines in the file
 	//
@@ -206,13 +206,19 @@ int LinuxParser::RunningProcesses() {
 
 }
 
-// TODO: Read and return the command associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid) {
+	FileParser parser(kProcDirectory + to_string(pid) + kCmdlineFilename);
+	const auto& lines = parser.GetLines();
 
-// TODO: Read and return the memory used by a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid[[maybe_unused]]) { return string(); }
+	return (lines.size() == 0) ? string() : lines[0];
+}
+
+string LinuxParser::Ram(int pid) {
+	FileParser parser(kProcDirectory + to_string(pid) + kStatusFilename);
+	auto ram_mb = parser.GetLong("VmSize:") / 1024; // Convert to mb
+
+	return to_string(ram_mb);
+}
 
 string LinuxParser::Uid(int pid) {
 	FileParser parser(kProcDirectory + to_string(pid) + kStatusFilename);

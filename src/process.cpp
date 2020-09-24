@@ -11,22 +11,24 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-Process::Process(int pid) : pid_(pid) {}
+Process::Process(int pid) : pid_(pid) {
+	command_ = LinuxParser::Command(pid_);
+	ram_ = LinuxParser::Ram(pid_);
+	user_ = LinuxParser::User(pid_);
+}
 
 int Process::Pid() const { return pid_; }
 
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() { return 0; }
 
-// TODO: Return the command that generated this process
-string Process::Command() { return string(); }
+string Process::Command() { return command_; }
 
-// TODO: Return this process's memory utilization
-string Process::Ram() { return string(); }
+string Process::Ram() { return ram_; }
 
-string Process::User() { return LinuxParser::User(pid_); }
+string Process::User() { return user_; }
 
 // TODO: Return the age of this process (in seconds)
 long int Process::UpTime() { return 0; }
 
-bool Process::operator<(Process const& a) const { return pid_ < a.Pid(); }
+bool Process::operator<(Process const& a) const { return Pid() > a.Pid(); }
