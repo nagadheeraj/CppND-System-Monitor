@@ -15,6 +15,9 @@ Process::Process(int pid) : pid_(pid) {
 	command_ = LinuxParser::Command(pid_);
 	ram_ = LinuxParser::Ram(pid_);
 	user_ = LinuxParser::User(pid_);
+	auto start_time = LinuxParser::UpTime(pid_) / sysconf(_SC_CLK_TCK);
+	auto system_uptime = LinuxParser::UpTime();
+	uptime_ = system_uptime - start_time;
 }
 
 int Process::Pid() const { return pid_; }
@@ -22,13 +25,12 @@ int Process::Pid() const { return pid_; }
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() { return 0; }
 
-string Process::Command() { return command_; }
+string Process::Command() const { return command_; }
 
-string Process::Ram() { return ram_; }
+string Process::Ram() const { return ram_; }
 
-string Process::User() { return user_; }
+string Process::User() const { return user_; }
 
-// TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { return 0; }
+long int Process::UpTime() const { return uptime_; }
 
-bool Process::operator<(Process const& a) const { return Pid() > a.Pid(); }
+bool Process::operator<(Process const& a) const { return UpTime() > a.UpTime(); }

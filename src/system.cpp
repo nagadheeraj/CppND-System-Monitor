@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 
+#include "linux_parser.h"
 #include "process.h"
 #include "processor.h"
 #include "system.h"
-#include "linux_parser.h"
 
 using std::set;
 using std::size_t;
@@ -15,20 +15,19 @@ using std::string;
 using std::vector;
 
 System::System() {
-	kernel_ = LinuxParser::Kernel();
-	os_ = LinuxParser::OperatingSystem();
+  kernel_ = LinuxParser::Kernel();
+  os_ = LinuxParser::OperatingSystem();
 }
 
 Processor& System::Cpu() { return cpu_; }
 
 vector<Process>& System::Processes() {
-        processes_.clear();
+  processes_.clear();
 
-	for (auto& pid : LinuxParser::Pids())
-		processes_.emplace_back(Process(pid));
+  for (auto& pid : LinuxParser::Pids()) processes_.emplace_back(Process(pid));
 
-	std::sort(processes_.begin(), processes_.end());
-	return processes_;
+  std::sort(processes_.begin(), processes_.end());
+  return processes_;
 }
 
 std::string System::Kernel() { return kernel_; }
