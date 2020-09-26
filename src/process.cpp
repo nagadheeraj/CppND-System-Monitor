@@ -13,24 +13,29 @@ using std::vector;
 
 Process::Process(int pid) : pid_(pid) {
 	command_ = LinuxParser::Command(pid_);
-	ram_ = LinuxParser::Ram(pid_);
 	user_ = LinuxParser::User(pid_);
-	auto start_time = LinuxParser::UpTime(pid_) / sysconf(_SC_CLK_TCK);
-	auto system_uptime = LinuxParser::UpTime();
-	uptime_ = system_uptime - start_time;
 }
 
 int Process::Pid() const { return pid_; }
 
-// TODO: Return this process's CPU utilization
-float Process::CpuUtilization() { return 0; }
+float Process::CpuUtilization() const {
+	auto run_time = LinuxParser::ActiveJiffies(pid_) / sysconf(_SC_CLK_TCK);
+	auto sys_time = LinuxParser::UpTime();
+	return 100.0 * run_time / sys_time;
+}
 
 string Process::Command() const { return command_; }
 
-string Process::Ram() const { return ram_; }
+string Process::Ram() const { return LinuxParser::Ram(pid_); }
 
 string Process::User() const { return user_; }
 
-long int Process::UpTime() const { return uptime_; }
+long int Process::UpTime() const {
+	auto start_time = LinuxParser::UpTime(pid_) / sysconf(_SC_CLK_TCK);
+	auto system_uptime = LinuxParser::UpTime();
+	return system_uptime - start_time;
+}
 
-bool Process::operator<(Process const& a) const { return UpTime() > a.UpTime(); }
+bool Process::operator<(Process const& a) const {
+	return CpuUtilization() > a.CpuUtilization();
+}

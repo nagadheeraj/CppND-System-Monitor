@@ -206,8 +206,7 @@ long LinuxParser::UpTime() {
   return res;
 }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies() { return ActiveJiffies() + IdleJiffies(); }
 
 long LinuxParser::ActiveJiffies(int pid) {
   FileParser parser(kProcDirectory + to_string(pid) + kStatFilename);
@@ -218,11 +217,31 @@ long LinuxParser::ActiveJiffies(int pid) {
   return utime + stime;
 }
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() {
+	FileParser parser(kProcDirectory + kStatFilename);
+	constexpr auto PROC_USER_IDX = 2;
+	constexpr auto PROC_NICE_IDX = 3;
+	constexpr auto PROC_SYSTEM_IDX = 4;
+	constexpr auto PROC_IRQ_IDX = 7;
+	constexpr auto PROC_SOFTIRQ_IDX = 8;
+	constexpr auto PROC_STEAL_IDX = 9;
 
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+	return parser.GetLong(1, PROC_USER_IDX) +
+		parser.GetLong(1, PROC_NICE_IDX) +
+		parser.GetLong(1, PROC_SYSTEM_IDX) +
+		parser.GetLong(1, PROC_IRQ_IDX) +
+		parser.GetLong(1, PROC_SOFTIRQ_IDX) +
+		parser.GetLong(1, PROC_STEAL_IDX);
+}
+
+long LinuxParser::IdleJiffies() {
+	FileParser parser(kProcDirectory + kStatFilename);
+	constexpr auto PROC_IDLE_IDX = 5;
+	constexpr auto PROC_IOWAIT_IDX = 6;
+
+	return parser.GetLong(1, PROC_IDLE_IDX) +
+		parser.GetLong(1, PROC_IOWAIT_IDX);
+}
 
 vector<string> LinuxParser::CpuUtilization() {
   FileParser parser(kProcDirectory + kStatFilename);
