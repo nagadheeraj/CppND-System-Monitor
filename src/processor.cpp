@@ -8,5 +8,5 @@ using std::string;
 using std::vector;
 
 float Processor::Utilization() {
-	return 100.0 * LinuxParser::ActiveJiffies() / LinuxParser::Jiffies();
+  return 100.0 * LinuxParser::ActiveJiffies() / LinuxParser::Jiffies();
 }

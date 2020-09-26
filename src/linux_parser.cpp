@@ -218,29 +218,26 @@ long LinuxParser::ActiveJiffies(int pid) {
 }
 
 long LinuxParser::ActiveJiffies() {
-	FileParser parser(kProcDirectory + kStatFilename);
-	constexpr auto PROC_USER_IDX = 2;
-	constexpr auto PROC_NICE_IDX = 3;
-	constexpr auto PROC_SYSTEM_IDX = 4;
-	constexpr auto PROC_IRQ_IDX = 7;
-	constexpr auto PROC_SOFTIRQ_IDX = 8;
-	constexpr auto PROC_STEAL_IDX = 9;
+  FileParser parser(kProcDirectory + kStatFilename);
+  constexpr auto PROC_USER_IDX = 2;
+  constexpr auto PROC_NICE_IDX = 3;
+  constexpr auto PROC_SYSTEM_IDX = 4;
+  constexpr auto PROC_IRQ_IDX = 7;
+  constexpr auto PROC_SOFTIRQ_IDX = 8;
+  constexpr auto PROC_STEAL_IDX = 9;
 
-	return parser.GetLong(1, PROC_USER_IDX) +
-		parser.GetLong(1, PROC_NICE_IDX) +
-		parser.GetLong(1, PROC_SYSTEM_IDX) +
-		parser.GetLong(1, PROC_IRQ_IDX) +
-		parser.GetLong(1, PROC_SOFTIRQ_IDX) +
-		parser.GetLong(1, PROC_STEAL_IDX);
+  return parser.GetLong(1, PROC_USER_IDX) + parser.GetLong(1, PROC_NICE_IDX) +
+         parser.GetLong(1, PROC_SYSTEM_IDX) + parser.GetLong(1, PROC_IRQ_IDX) +
+         parser.GetLong(1, PROC_SOFTIRQ_IDX) +
+         parser.GetLong(1, PROC_STEAL_IDX);
 }
 
 long LinuxParser::IdleJiffies() {
-	FileParser parser(kProcDirectory + kStatFilename);
-	constexpr auto PROC_IDLE_IDX = 5;
-	constexpr auto PROC_IOWAIT_IDX = 6;
+  FileParser parser(kProcDirectory + kStatFilename);
+  constexpr auto PROC_IDLE_IDX = 5;
+  constexpr auto PROC_IOWAIT_IDX = 6;
 
-	return parser.GetLong(1, PROC_IDLE_IDX) +
-		parser.GetLong(1, PROC_IOWAIT_IDX);
+  return parser.GetLong(1, PROC_IDLE_IDX) + parser.GetLong(1, PROC_IOWAIT_IDX);
 }
 
 vector<string> LinuxParser::CpuUtilization() {
