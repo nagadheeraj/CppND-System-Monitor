@@ -21,7 +21,7 @@ int Process::Pid() const { return pid_; }
 float Process::CpuUtilization() const {
   auto run_time = LinuxParser::ActiveJiffies(pid_) / sysconf(_SC_CLK_TCK);
   auto sys_time = LinuxParser::UpTime();
-  return 100.0 * run_time / sys_time;
+  return run_time / sys_time;
 }
 
 string Process::Command() const { return command_; }
