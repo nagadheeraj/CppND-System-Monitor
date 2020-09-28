@@ -180,12 +180,12 @@ vector<int> LinuxParser::Pids() {
 
 float LinuxParser::MemoryUtilization() {
   FileParser parser(kProcDirectory + kMeminfoFilename);
-  long mem_total = parser.GetLong("MemTotal:");
-  long mem_free = parser.GetLong("MemFree:");
-  long buffers = parser.GetLong("Buffers:");
+  const long mem_total = parser.GetLong("MemTotal:");
+  const long mem_free = parser.GetLong("MemFree:");
+  const long buffers = parser.GetLong("Buffers:");
   long cached = parser.GetLong("Cached:");
-  long sreclaimable = parser.GetLong("SReclaimable:");
-  long shmem = parser.GetLong("Shmem:");
+  const long sreclaimable = parser.GetLong("SReclaimable:");
+  const long shmem = parser.GetLong("Shmem:");
   long mem_used = mem_total - mem_free;
 
   cached += sreclaimable - shmem;
@@ -212,8 +212,8 @@ long LinuxParser::ActiveJiffies(int pid) {
   FileParser parser(kProcDirectory + to_string(pid) + kStatFilename);
   constexpr auto PROC_UTIME_TIME_IDX = 14;
   constexpr auto PROC_STIME_TIME_IDX = 15;
-  auto utime = parser.GetLong(1, PROC_UTIME_TIME_IDX);
-  auto stime = parser.GetLong(1, PROC_STIME_TIME_IDX);
+  const auto utime = parser.GetLong(1, PROC_UTIME_TIME_IDX);
+  const auto stime = parser.GetLong(1, PROC_STIME_TIME_IDX);
   return utime + stime;
 }
 
